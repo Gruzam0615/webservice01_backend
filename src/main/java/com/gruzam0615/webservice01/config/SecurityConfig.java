@@ -1,7 +1,11 @@
 package com.gruzam0615.webservice01.config;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,6 +17,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gruzam0615.webservice01.sign.SignOutDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,7 +51,19 @@ public class SecurityConfig {
         http.logout(logout -> logout
             .logoutUrl("/api/sign/signOut")
             .addLogoutHandler(logoutHandler)
-            .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext())
+            .logoutSuccessHandler((request, response, authentication) -> { 
+                SecurityContextHolder.clearContext();
+
+                SignOutDTO resultDTO = new SignOutDTO();
+                resultDTO.setHttpStatus(HttpStatus.OK);
+                resultDTO.setMessage("signOut Complete");
+                resultDTO.setData(true);
+                String result = new ObjectMapper().writeValueAsString(resultDTO);
+
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(result);
+            })
         );
         http.exceptionHandling(exception -> exception
             .authenticationEntryPoint(authenticationEntryPoint)

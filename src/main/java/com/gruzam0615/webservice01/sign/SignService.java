@@ -13,7 +13,6 @@ import com.gruzam0615.webservice01.users.entity.Users;
 import com.gruzam0615.webservice01.users.entity.UsersRole;
 import com.gruzam0615.webservice01.users.repository.UsersRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

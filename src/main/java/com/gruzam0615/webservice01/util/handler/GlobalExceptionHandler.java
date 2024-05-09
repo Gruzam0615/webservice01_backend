@@ -2,6 +2,7 @@ package com.gruzam0615.webservice01.util.handler;
 
 import java.util.NoSuchElementException;
 
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -31,6 +32,18 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.ok()
             .body(ResponseHandler.<Object>builder()
                 .httpStatus(HttpStatus.BAD_REQUEST)
+                .data(null)
+                .message(ex.getMessage())
+                .build()
+            );
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    protected ResponseEntity<ResponseHandler<Object>> notFoundException(Exception ex) {
+        log.error("NotFound Exception");
+        return ResponseEntity.ok()
+            .body(ResponseHandler.<Object>builder()
+                .httpStatus(HttpStatus.NOT_FOUND)
                 .data(null)
                 .message(ex.getMessage())
                 .build()
