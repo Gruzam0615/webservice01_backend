@@ -1,4 +1,4 @@
-package com.gruzam0615.webservice01.config;
+package com.gruzam0615.webservice01.config.exception;
 
 import java.io.IOException;
 
@@ -24,8 +24,9 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        log.error("Authentication Exception");
-        // log.debug("request:\n${}\nresponse:\n{}\nexception:\n{}", request, response, authException.getStackTrace());
+        log.error("AuthenticationEntryPoint Occur Exception");        
+        log.error("Error: {}", authException.getClass());
+        
         handlerExceptionResolver.resolveException(request, response, null, authException);
     }
     

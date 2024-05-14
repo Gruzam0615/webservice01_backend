@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
@@ -30,12 +31,24 @@ public class SecurityConfig {
 
     private static final String[] PERMIT_URL_LIST = {
         "/api/sign/**",
-        "/api/user/test01"
+        "/api/user/test01",
+        
+        "/v2/api-docs",
+        "/v3/api-docs",
+        "/v3/api-docs/**",
+        "/swagger-resources",
+        "/swagger-resources/**",
+        "/configuration/ui",
+        "/configuration/security",
+        "/swagger-ui/**",
+        "/webjars/**",
+        "/swagger-ui.html"
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
     private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final AccessDeniedHandler accessDeniedHandler;
     
     @Bean
     public  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -67,7 +80,7 @@ public class SecurityConfig {
         );
         http.exceptionHandling(exception -> exception
             .authenticationEntryPoint(authenticationEntryPoint)
-            .accessDeniedHandler(new CustomAccessDeniedException())            
+            .accessDeniedHandler(accessDeniedHandler)            
         );
 
         return http.build();

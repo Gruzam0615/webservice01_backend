@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.client.HttpClientErrorException.Forbidden;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
+
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -76,7 +78,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ResponseHandler<Object>> authenticationException(AuthenticationException ex) {
-        log.error("AuthenticationException Exception");
+        log.error("Authentication Exception");
+        return ResponseEntity.ok()
+            .body(ResponseHandler.<Object>builder()
+                .httpStatus(HttpStatus.FORBIDDEN)
+                .data(null)
+                // .message(ex.getMessage())
+                .message("Invalid Auth")
+                .build()
+            );
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity<ResponseHandler<Object>> tokenExpiredException(TokenExpiredException ex) {
+        log.error("TokenExpired Exception");
         return ResponseEntity.ok()
             .body(ResponseHandler.<Object>builder()
                 .httpStatus(HttpStatus.FORBIDDEN)

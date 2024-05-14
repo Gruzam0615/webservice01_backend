@@ -33,25 +33,36 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if(request.getServletPath().contains("/api/sign")) {
-            log.debug("doFilterInternal");
+            // log.debug("doFilterInternal");
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String authHeader = request.getHeader("Authorization");
+        String authHeader = request.getHeader("authorization");
         final String jwt;
         String username;
 
-        if(authHeader == null || authHeader.startsWith("Bearer ")) {
-            log.debug("Token doesn't exist");
+        // log.debug("header: {}", request.getHeader("authorization"));
+        // log.debug("authHeader: {}", authHeader);
+
+        // if(authHeader == null || authHeader.startsWith("Bearer ")) {
+        if(authHeader == null) {
+            log.debug("Token is Null or Token with Bearer");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Bearer [Token]
-        jwt = authHeader.substring(7);
-        // username = jwtService.extractUsername(jwt);
-        username = jwtService.extractUsername(authHeader);
+        if(authHeader.startsWith("Bearer ")) {
+            // Bearer [Token]
+            log.debug("Token start with Bearer"); 
+            jwt = authHeader.substring(7);
+            authHeader = jwt;
+            username = jwtService.extractUsername(jwt);
+        }
+        else {
+            log.debug("Token not include Bearer");
+            username = jwtService.extractUsername(authHeader);
+        }
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             log.debug("username: {}", username);

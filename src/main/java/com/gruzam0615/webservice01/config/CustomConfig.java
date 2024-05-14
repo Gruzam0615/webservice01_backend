@@ -2,6 +2,7 @@ package com.gruzam0615.webservice01.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -28,6 +29,11 @@ public class CustomConfig {
         log.info("Config find user");
         return username -> usersRepository.findByUsersName(username).get();
             // .orElseThrow(() -> new UsernameNotFoundException("Can not find user"));
+    }
+
+    @Bean
+    public AuditorAware<Long> auditorAware() {
+        return new ApplicationAuditAware();
     }
 
     @Bean

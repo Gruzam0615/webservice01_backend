@@ -1,4 +1,4 @@
-package com.gruzam0615.webservice01.config;
+package com.gruzam0615.webservice01.config.exception;
 
 import java.io.IOException;
 
