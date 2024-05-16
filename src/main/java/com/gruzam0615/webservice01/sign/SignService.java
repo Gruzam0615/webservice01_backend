@@ -2,6 +2,7 @@ package com.gruzam0615.webservice01.sign;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,6 +10,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.gruzam0615.webservice01.config.JwtService;
+import com.gruzam0615.webservice01.token.Token;
+import com.gruzam0615.webservice01.token.TokenRepository;
 import com.gruzam0615.webservice01.users.entity.Users;
 import com.gruzam0615.webservice01.users.entity.UsersRole;
 import com.gruzam0615.webservice01.users.repository.UsersRepository;
@@ -22,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SignService {
     
     private final UsersRepository usersRepository;
+    private final TokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
@@ -65,27 +69,40 @@ public class SignService {
         );
         var u = usersRepository.findByUsersName(param.getAccount()).get();
         var jwtToken = jwtService.generateToken(u);
-        var refreshToken = jwtService.generateRefreshToken(u);
-        revokeTokens(u);
+        // var refreshToken = jwtService.generateRefreshToken(u);
         saveUserToken(u, jwtToken);
         return jwtToken;
     }
 
+    // Users 객체에 token 속성이 포함되었을 때
+    // public void saveUserToken(Users user, String jwtToken) {
+    //     log.info("Called saveToken() Timestamp: {}", new Date(System.currentTimeMillis()).toString());
+    //     var u = usersRepository.findByUsersName(user.getUsersName()).get();
+    //     u.setUsersToken(jwtToken);
+    //     u.setUsersUpdatedTime(LocalDateTime.now());
+    //     usersRepository.save(u);
+    // }
     public void saveUserToken(Users user, String jwtToken) {
         log.info("Called saveToken() Timestamp: {}", new Date(System.currentTimeMillis()).toString());
         var u = usersRepository.findByUsersName(user.getUsersName()).get();
-        u.setUsersToken(jwtToken);
-        u.setUsersUpdatedTime(LocalDateTime.now());
-        usersRepository.save(u);
-    }
 
-    public void revokeTokens(Users user) {
-        log.info("Called revokeToken() Timestamp: {}", new Date(System.currentTimeMillis()).toString());
-        var u = usersRepository.findByUsersName(user.getUsersName()).get();
-        // if(u.getUsersToken().isEmpty() || u.getUsersToken2().isEmpty()) return;
-        u.setUsersToken(null);
-        u.setUsersToken2(null);
-        usersRepository.save(u);
+        if(u.getTokens() == null) {
+            Token t = new Token();
+            t.setToken(jwtToken);
+            t.setExpired(false);
+            t.setRevoked(false);
+            t.setUpdatedDate(LocalDateTime.now());
+            t.setUser(u);
+            tokenRepository.save(t);
+        } else {
+            Token t = u.getTokens();
+            t.setToken(jwtToken);
+            t.setExpired(false);
+            t.setRevoked(false);
+            t.setUpdatedDate(LocalDateTime.now());
+            t.setUser(u);
+            tokenRepository.save(t);
+        }        
     }
 
 }

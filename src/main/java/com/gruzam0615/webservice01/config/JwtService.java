@@ -11,6 +11,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.gruzam0615.webservice01.token.Token;
 import com.gruzam0615.webservice01.users.entity.Users;
 
 import lombok.extern.slf4j.Slf4j;
@@ -60,12 +61,8 @@ public class JwtService {
             .sign(Algorithm.HMAC256(secretkey));
     }
 
-    public boolean isTokenValid(String token, Users user) {
-        final String username = extractUsername(token);
-        // log.debug("token username: {}", username);
-        // log.debug("username: {}", user.getUsername());
-        
-        return (username.equals(user.getUsersName())) && isTokenExpired(token);
+    public boolean isTokenValid(String token, Token object) {
+        return (!object.isExpired() && !object.isRevoked()) && isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {

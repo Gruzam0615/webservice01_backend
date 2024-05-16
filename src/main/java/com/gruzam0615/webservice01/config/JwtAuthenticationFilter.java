@@ -10,6 +10,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.gruzam0615.webservice01.token.Token;
+import com.gruzam0615.webservice01.token.TokenRepository;
 import com.gruzam0615.webservice01.users.entity.Users;
 import com.gruzam0615.webservice01.users.repository.UsersRepository;
 
@@ -66,12 +68,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             log.debug("username: {}", username);
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-            log.debug("userDetails: {}", userDetails.toString());
-            Users u = tokenRepository.findByUsersToken(authHeader).get();
-            log.debug("Users: {}", u.toString());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            log.debug("userDetails: {}", userDetails.getUsername());
+            // Users u = tokenRepository.findByUsersToken(authHeader).get();
+            Token t = tokenRepository.findByToken(authHeader).get();
 
-            var isTokenValid = jwtService.isTokenValid(authHeader, u);
+            var isTokenValid = jwtService.isTokenValid(authHeader, t);
             log.debug("isTokenValid result: {}", isTokenValid);
             if(isTokenValid) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
