@@ -30,7 +30,7 @@ public class SignController {
         if(data == true) {
             return ResponseEntity.ok()
                 .body(ResponseHandler.<Boolean>builder()
-                    .httpStatus(HttpStatus.OK)
+                    .httpStatus(HttpStatus.OK.value())
                     .message("signUp Complete")
                     .data(true)
                     .build()
@@ -38,7 +38,7 @@ public class SignController {
         } else {
             return ResponseEntity.ok()
                 .body(ResponseHandler.<Boolean>builder()
-                    .httpStatus(HttpStatus.OK)
+                    .httpStatus(HttpStatus.OK.value())
                     .message("signUp InComplete")
                     .data(false)
                     .build()
@@ -53,7 +53,7 @@ public class SignController {
         if(data != null) {
             return ResponseEntity.ok()
                 .body(ResponseHandler.<String>builder()
-                    .httpStatus(HttpStatus.OK)
+                    .httpStatus(HttpStatus.OK.value())
                     .message("signIn Complete")
                     .data(data)
                     .build()
@@ -61,7 +61,7 @@ public class SignController {
         } else {
             return ResponseEntity.ok()
                 .body(ResponseHandler.<String>builder()
-                    .httpStatus(HttpStatus.OK)
+                    .httpStatus(HttpStatus.OK.value())
                     .message("signIn InComplete")
                     .data(data)
                     .build()

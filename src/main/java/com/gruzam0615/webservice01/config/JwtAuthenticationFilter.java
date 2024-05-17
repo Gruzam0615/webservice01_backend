@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username = jwtService.extractUsername(jwt);
         }
         else {
-            log.debug("Token not include Bearer");
+            log.debug("Token Not start with Bearer"); 
             username = jwtService.extractUsername(authHeader);
         }
 

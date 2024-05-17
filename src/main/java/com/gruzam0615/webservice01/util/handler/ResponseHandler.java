@@ -5,5 +5,5 @@ import org.springframework.http.HttpStatus;
 import lombok.Builder;
 
 @Builder
-public record ResponseHandler<T>(HttpStatus httpStatus, String message, T data) {
+public record ResponseHandler<T>(int httpStatus, String message, T data) {
 }

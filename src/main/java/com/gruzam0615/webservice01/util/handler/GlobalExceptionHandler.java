@@ -33,7 +33,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Global Exception");
         return ResponseEntity.ok()
             .body(ResponseHandler.<Object>builder()
-                .httpStatus(HttpStatus.BAD_REQUEST)
+                .httpStatus(HttpStatus.BAD_REQUEST.value())
                 .data(null)
                 .message(ex.getMessage())
                 .build()
@@ -45,7 +45,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("NotFound Exception");
         return ResponseEntity.ok()
             .body(ResponseHandler.<Object>builder()
-                .httpStatus(HttpStatus.NOT_FOUND)
+                .httpStatus(HttpStatus.NOT_FOUND.value())
                 .data(null)
                 .message(ex.getMessage())
                 .build()
@@ -57,7 +57,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("NullPointer Exception");
         return ResponseEntity.ok()
             .body(ResponseHandler.<Object>builder()
-                .httpStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION)
+                .httpStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value())
                 .data(null)
                 .message(ex.getMessage())
                 .build()
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("NoSuchElement Exception");
         return ResponseEntity.ok()
             .body(ResponseHandler.<Object>builder()
-                .httpStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION)
+                .httpStatus(HttpStatus.NON_AUTHORITATIVE_INFORMATION.value())
                 .data(null)
                 .message(ex.getMessage())
                 .build()
@@ -81,7 +81,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("Authentication Exception");
         return ResponseEntity.ok()
             .body(ResponseHandler.<Object>builder()
-                .httpStatus(HttpStatus.FORBIDDEN)
+                .httpStatus(HttpStatus.FORBIDDEN.value())
                 .data(null)
                 // .message(ex.getMessage())
                 .message("Invalid Auth")
@@ -94,7 +94,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("TokenExpired Exception");
         return ResponseEntity.ok()
             .body(ResponseHandler.<Object>builder()
-                .httpStatus(HttpStatus.FORBIDDEN)
+                .httpStatus(HttpStatus.FORBIDDEN.value())
                 .data(null)
                 .message(ex.getMessage())
                 .build()
