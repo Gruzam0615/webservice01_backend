@@ -46,9 +46,11 @@ public class SignController {
         }
     }
 
-    @PostMapping("/signIn")
+    @PostMapping(value = "/signIn")
     public ResponseEntity<ResponseHandler<String>> signInController(@RequestBody SignDTO param) {
         log.info("Called signInController() Timestamp: {}", new Date(System.currentTimeMillis()).toString());
+        log.info("username: {}", param.getAccount());
+
         String data = signService.signInService(param);
         if(data != null) {
             return ResponseEntity.ok()
