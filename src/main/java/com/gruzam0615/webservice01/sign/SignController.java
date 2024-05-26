@@ -46,7 +46,7 @@ public class SignController {
         }
     }
 
-    @PostMapping(value = "/signIn")
+    @PostMapping(value = "/signIn", consumes = "application/json", produces = "application/json")
     public ResponseEntity<ResponseHandler<String>> signInController(@RequestBody SignDTO param) {
         log.info("Called signInController() Timestamp: {}", new Date(System.currentTimeMillis()).toString());
         log.info("username: {}", param.getAccount());

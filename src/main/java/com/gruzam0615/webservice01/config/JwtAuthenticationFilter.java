@@ -1,7 +1,10 @@
 package com.gruzam0615.webservice01.config;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,9 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.gruzam0615.webservice01.token.Token;
 import com.gruzam0615.webservice01.token.TokenRepository;
-import com.gruzam0615.webservice01.users.entity.Users;
-import com.gruzam0615.webservice01.users.repository.UsersRepository;
-
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,61 +31,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
 
-
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(request.getServletPath().contains("/api/sign")) {
-            // log.debug("doFilterInternal");
+    protected void doFilterInternal(
+        @NonNull HttpServletRequest request, 
+        @NonNull HttpServletResponse response, 
+        @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
+
+        List<String> noTokenUrl = Arrays.asList(
+            "/api/sign/signUp",
+            "/api/sign/signIn"
+        );
+        if(noTokenUrl.contains(request.getServletPath())) {
+            log.info("Requested noTokenUrl url: {}", request.getServletPath());
+            filterChain.doFilter(request, response);
+        } else {
+            log.info("Requested not noTokenUrl url: {}", request.getServletPath());
+        }
+
+        String jwt = request.getHeader("Authorization");
+        String userName;
+        if(jwt == null) {
             filterChain.doFilter(request, response);
             return;
         }
+        userName = jwtService.extractUsername(jwt);
+        if(userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
+            Token t = tokenRepository.findByToken(jwt).get();
+            var isTokenValid = jwtService.isTokenValid(jwt, t);
 
-        String authHeader = request.getHeader("authorization");
-        final String jwt;
-        String username;
-
-        // log.debug("header: {}", request.getHeader("authorization"));
-        // log.debug("authHeader: {}", authHeader);
-
-        // if(authHeader == null || authHeader.startsWith("Bearer ")) {
-        if(authHeader == null) {
-            log.debug("Token is Null or Token with Bearer");
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        if(authHeader.startsWith("Bearer ")) {
-            // Bearer [Token]
-            log.debug("Token start with Bearer"); 
-            jwt = authHeader.substring(7);
-            authHeader = jwt;
-            username = jwtService.extractUsername(jwt);
-        }
-        else {
-            log.debug("Token Not start with Bearer"); 
-            username = jwtService.extractUsername(authHeader);
-        }
-
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            log.debug("username: {}", username);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            log.debug("userDetails: {}", userDetails.getUsername());
-            // Users u = tokenRepository.findByUsersToken(authHeader).get();
-            Token t = tokenRepository.findByToken(authHeader).get();
-
-            var isTokenValid = jwtService.isTokenValid(authHeader, t);
-            log.debug("isTokenValid result: {}", isTokenValid);
-            if(isTokenValid) {
+            if(isTokenValid && !t.isExpired() && !t.isRevoked()) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userDetails.getUsername(),
-                    userDetails.getPassword(),
+                    userDetails,
+                    null,
                     userDetails.getAuthorities()
                 );
                 authenticationToken.setDetails(
                     new WebAuthenticationDetailsSource().buildDetails(request)
                 );
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            }
+            }                
         }
         filterChain.doFilter(request, response);
     }

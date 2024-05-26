@@ -47,13 +47,13 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
     private final LogoutHandler logoutHandler;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+    // private final AuthenticationEntryPoint authenticationEntryPoint;
     private final AccessDeniedHandler accessDeniedHandler;
     
     @Bean
     public  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(cors -> cors.disable());
+        // http.cors(cors -> cors.disable());
         http.authorizeHttpRequests(req -> req
             .requestMatchers(PERMIT_URL_LIST).permitAll()
             .anyRequest().authenticated()
@@ -79,7 +79,7 @@ public class SecurityConfig {
             })
         );
         http.exceptionHandling(exception -> exception
-            .authenticationEntryPoint(authenticationEntryPoint)
+            // .authenticationEntryPoint(authenticationEntryPoint)
             .accessDeniedHandler(accessDeniedHandler)            
         );
 
