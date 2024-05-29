@@ -1,6 +1,7 @@
 package com.gruzam0615.webservice01.config;
 
 import java.util.Date;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -30,28 +31,32 @@ public class LogoutService implements LogoutHandler {
     private final SignOutService signOutService;
 
     @Override
-    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        log.info("Called signOut() timestamp: {}", new Date(System.currentTimeMillis()).toString());
-        final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-
-        if(authHeader == null || authHeader.startsWith("Bearer ")) {
-            return;
-        }
-        else {
-            jwt = authHeader.substring(7);
-
-            // var stored = tokenRepository.findByUsersToken(authHeader).get();
-            var t = tokenRepository.findByToken(authHeader).get();
-            var stored = usersRepository.findById(t.getUser().getUsersIndex()).get();
-
-            if(stored != null) {
-                signOutService.revokeTokens(stored);
-                SecurityContextHolder.clearContext();
+    public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication)  {
+        try{
+            log.info("Called signOut() timestamp: {}", new Date(System.currentTimeMillis()).toString());
+        
+            String jwt = request.getHeader("Authorization");
+            if(jwt == null) {
+                log.info("Already SignOut");
+                new NullPointerException();
             }
             else {
-                log.debug("stored is null");
+                // var stored = tokenRepository.findByUsersToken(authHeader).get();
+                var t = tokenRepository.findByToken(jwt).get();
+                var stored = usersRepository.findById(t.getUser().getUsersIndex()).get();
+
+                if(stored != null) {
+                    signOutService.revokeTokens(stored);
+                    SecurityContextHolder.clearContext();
+                }
+                else {
+                    log.error("Invalid User");
+                    new NoSuchElementException();
+                }
             }
+        }
+        catch(Exception exception) {
+
         }
     }
     
